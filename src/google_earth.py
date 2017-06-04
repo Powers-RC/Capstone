@@ -6,10 +6,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from PIL import Image
+import subprocess
+import re
 import time
 import csv
-import os
 import pdb
 
 def create_folders(coordinates):
@@ -20,25 +20,38 @@ def create_folders(coordinates):
         if not os.path.exists(filepath):
             os.makedirs(filepath)
 
+def get_screen_res():
+    '''
+    Gets the screen resolution of a mac
+    output: returns the pixel width and height of your monitor
+    '''
+
+    results = str(subprocess.Popen(['system_profiler SPDisplaysDataType'],stdout=subprocess.PIPE, shell=True).communicate()[0])
+    res = re.search('Resolution: \d* x \d*', results).group(0).split(' ')
+    width, height = res[1], res[3]
+    return width, height
+
 def take_area_photos(coordinates):
+    '''
+    Takes a screen shot using GE from some starting quardinates, shifting the size of the image each iteration.
+    input: an iterable of image coodinate locations
+    output: a png image file
+    '''
+    width, height = get_screen_res()
+    get_screen_res()
     driver = webdriver.Chrome()
-    driver.set_window_size(1440, 900)
+    driver.set_window_size(width, height)
     driver.maximize_window()
     driver.switch_to_window(driver.window_handles[0])
     delay = 60
 
-    # area_lst = [area.split(',')for area in coordinates]
-    #
-    # for area in area_lst:
-    #     if area[0] == area_name:
-    #         coordinates = area[1:]
     for i, c in enumerate(coordinates):
-        filepath = '/Users/One-Life.Grind./Galvanize/Capstone/images/Canino_Lanocito_Richardson/' + str(i) + '.png'
-        lat, lon = c.split(';')
+        # a = c.split(',')
+        # print(a)
+        # filepath = '/Users/One-Life.Grind./Galvanize/Capstone/images/Canino_Lanocito_Richardson/' + str(i) + '.png'
+        # lat, lon = c.split(';')[1:]
         url = "https://earth.google.com/web/@{},{},1573.2221546a,277.89739987d,35y,0.69169508h,0.45101597t,-0r".format(40.0851667, -105.1784944)
         driver.get(url)
-        # print(WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.ID, 'icon'))))
-        # driver.implicitly_wait(60)
         time.sleep(30)
         driver.save_screenshot(filepath)
         break
@@ -49,31 +62,16 @@ def parse_area(max_lat, min_lat, max_lon, min_lon):
     input: string max and min coordinates of latitude and longitude
     output: lst of coordinates for each are the screenshot images
     '''
-    pass
+    #https://gis.stackexchange.com/questions/228489/how-to-convert-image-pixel-to-latitude-and-longitude
 
-
-def crop_image(filepath, outfile_path):
-    '''
-    This function is designed to crop screenshot images to produce the raw image.
-
-    input: Takes in the filepath to a file containg all the images
-    output: Saves cropped images to the outfile path argument
-    '''
-
-    image_files = os.listdir(filepath)
-    for p in image_files:
-        im = Image.open(filepath+'/'+p)
-        c_im = im.crop((55, 0, 1131, 675))
-        c_im.save(outfile_path+'/'+p)
-
-def make_small_image():
-    pass 
+    #https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet
 
 
 
 
 def find_boundries(area, coordinates):
     '''
+    Find the min and max boundries from field coordinates.
     input: coorinates and an area name(str)
     output: returns the high and low lat lons for that area
     '''
@@ -98,8 +96,6 @@ def find_boundries(area, coordinates):
 
 
 
-
-
 if __name__ == '__main__':
     filename = '../data/OSMPPrairieDogColonies.kmz'
 
@@ -120,8 +116,5 @@ if __name__ == '__main__':
 
     max_lat, min_lat, max_lon, min_lon = find_boundries('Jafay', coordinates)
 
-    #croping images in Jafay directory
-    x = crop_image('../images/Jafay', '../images/cropped_Jafay')
 
-
-    # take_area_photos(coordinates, "Brewbaker")
+    take_area_photos(coordinates)
