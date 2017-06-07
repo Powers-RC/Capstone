@@ -1,4 +1,4 @@
-# Blacktailed Boundries
+# Black-tailed Boundries
 
  Table of contents
  -----------------
