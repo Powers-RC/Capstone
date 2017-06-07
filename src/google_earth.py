@@ -11,6 +11,7 @@ import re
 import time
 import csv
 import pdb
+import math
 
 def create_folders(coordinates):
     for s in coordinates:
@@ -43,19 +44,22 @@ def take_area_photos(coordinates):
     driver.set_window_size(width, height)
     driver.maximize_window()
     driver.switch_to_window(driver.window_handles[0])
-    delay = 60
+
 
     for i, c in enumerate(coordinates):
-        # a = c.split(',')
-        # print(a)
-        # filepath = '/Users/One-Life.Grind./Galvanize/Capstone/images/Canino_Lanocito_Richardson/' + str(i) + '.png'
-        # lat, lon = c.split(';')[1:]
-        url = "https://earth.google.com/web/@{},{},1573.2221546a,277.89739987d,35y,0.69169508h,0.45101597t,-0r".format(40.0851667, -105.1784944)
+        filepath = '/Users/One-Life.Grind./Galvanize/Capstone/images/Jafay/' + str(i) + '.png'
+        lat, lon = c.split(',')
+        url = 'http://earth.google.com/web/@{},{},1615.83371101a,196.41606213d,35y,0h,0t,0r'.format(lat, lon)
         driver.get(url)
         time.sleep(30)
         driver.save_screenshot(filepath)
-        break
 
+    driver.close()
+
+
+# https://earth.google.com/web/@40.07879835,-105.16907049,1615.82020731a,195.38944324d,35y,0h,0t,0r
+#
+# https://earth.google.com/web/@40.0788,-105.169072,1615.83371101a,196.41606213d,35y,0h,0t,0r
 def parse_area(max_lat, min_lat, max_lon, min_lon):
     '''
     Given area coordinates parses area based on screenshot image size
@@ -66,6 +70,33 @@ def parse_area(max_lat, min_lat, max_lon, min_lon):
 
     #https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet
 
+    #https://spie.org/membership/spie-professional-magazine/spie-professional-archives-and-special-content/2016_october_archive/optics-of-google-earth
+
+    #https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+
+
+    # max_lat, min_lat, max_lon, min_lon = float(max_lat), float(min_lat), float(max_lon), float(min_lon)
+    coordinates = ['{},{}'.format(max_lat, max_lon)]
+    new_lat, new_lon = max_lat, max_lon
+    map_unit = .319444
+    h_offset = 720 * map_unit
+    v_offset = 237 * map_unit
+    R = 6378137
+
+    while new_lat >= min_lat:
+        true_max_lon = max_lon
+        if new_lon <= min_lon:
+            d_lon = h_offset/(R * math.cos(new_lat * math.pi/180))
+            new_lon = new_lon +  (d_lon * (180/math.pi))
+            coordinates.append('{},{}'.format(new_lat, new_lon))
+        else:
+            d_lat = v_offset/R
+            new_lat = new_lat - (d_lat * 180/math.pi)
+            new_lon = true_max_lon
+            coordinates.append('{},{}'.format(new_lat, new_lon))
+
+
+    return coordinates
 
 
 
@@ -90,31 +121,17 @@ def find_boundries(area, coordinates):
     min_lat = min(lat_lst)
     max_lon =  max(lon_lst)
     min_lon = min(lon_lst)
-
     return max_lat, min_lat, max_lon, min_lon
 
 
 
 
 if __name__ == '__main__':
-    filename = '../data/OSMPPrairieDogColonies.kmz'
-
-    kmz = ZipFile(filename, 'r')
-    kml = kmz.open('doc.kml', 'r')
-
-    parser = xml.sax.make_parser()
-    handler = PlacemarkHandler()
-    parser.setContentHandler(handler)
-    parser.parse(kml)
-    kmz.close
-
-    mapping = handler.mapping
-    coordinates = extract_coordinates(mapping)
-    pd_id = extract_pdid(mapping)
-
-    table = join_id_coordinates(pd_id, coordinates)
-
-    max_lat, min_lat, max_lon, min_lon = find_boundries('Jafay', coordinates)
 
 
-    take_area_photos(coordinates)
+    # max_lat, min_lat, max_lon, min_lon = find_boundries('Jafay', coordinates)
+    max_lat, max_lon, min_lat, min_lon = 40.078800, -105.169072, 40.072700, -105.150064
+    c = parse_area(max_lat, min_lat, max_lon, min_lon)
+
+
+    take_area_photos(c)
