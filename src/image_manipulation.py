@@ -75,6 +75,7 @@ def produce_images(images, outfile_path):
 
     for p in X_train:
         new_p = p.split('.')
+
         im = Image.open(outfile_path + '/'+p)
         m = PIL.ImageOps.mirror(im)
         new_m = new_p[0] + '-' + 'm' + '.' + new_p[1]
@@ -110,6 +111,6 @@ def produce_images(images, outfile_path):
 if __name__ == '__main__':
     # x = crop_image('../images/Jafay', '../images/cropped_Jafay')
     images = \
-    make_small_image('../images/cropped_Jafay', '../images/NN_ready_images')
+    make_small_image('../../images/cropped_Jafay', '../../Capstone_images/NN_ready_images')
 
-    X_train, X_test, validation = produce_images(images, '../images/NN_ready_images')
+    X_train, X_test, validation = produce_images(images, '../../Capstone_images/NN_ready_images')
