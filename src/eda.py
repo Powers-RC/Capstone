@@ -68,7 +68,7 @@ def plot_year_area_count(df):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.plot(X,y)
-    ax.set_title('Colony Numbers Per Year')
+    ax.set_title('Annual Colony Numbers')
     ax.xaxis.set_major_locator(ticker.MultipleLocator())
     ax.set_xlabel('Year')
     ax.set_ylabel('Number of Colonies')
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     num_df = df[['PD_ID', 'Year', 'Acres', 'Hectares', 'Perimeter', 'YearAcquir','sdeWildlif', 'Shape_area', 'Shape_len']]
 
     # make_scatter_matrix(num_df)
-    # x = plot_year_area_count(df)
+    x = plot_year_area_count(df)
     # x2 = plot_hist_kde(df)
     #
     # filename = '../data/OSMPPrairieDogColonies.kmz'
