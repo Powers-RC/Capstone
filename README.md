@@ -27,7 +27,7 @@ The Boulder prairie dog data contains:
 - Geospatial data for each of the areas
 - Measurements of the perimeter and area for the associated colonies
 
-![alt text](https://github.com/Powers-RC/Capstone/tree/master/images/area_ss.png)
+![areas image](images/area_ss.png)
 
 
 EDA
