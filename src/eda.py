@@ -5,7 +5,7 @@ import matplotlib.ticker as ticker
 from matplotlib.ticker import MultipleLocator
 from pandas.tools.plotting import scatter_matrix
 from scipy.stats.kde import gaussian_kde
-from kmz_extraction import PlacemarkHandler, make_table
+from kmz_extraction import PlacemarkHandler
 from zipfile import ZipFile
 import xml.sax, xml.sax.handler
 import csv
@@ -85,19 +85,19 @@ if __name__ == '__main__':
     num_df = df[['PD_ID', 'Year', 'Acres', 'Hectares', 'Perimeter', 'YearAcquir','sdeWildlif', 'Shape_area', 'Shape_len']]
 
     # make_scatter_matrix(num_df)
-    x = plot_year_area_count(df)
-    x2 = plot_hist_kde(df)
-
-    filename = '../data/OSMPPrairieDogColonies.kmz'
-
-    kmz = ZipFile(filename, 'r')
-    kml = kmz.open('doc.kml', 'r')
-
-    parser = xml.sax.make_parser()
-    handler = PlacemarkHandler()
-    parser.setContentHandler(handler)
-    parser.parse(kml)
-    kmz.close
-
-    mapping = handler.mapping
-    areas, coordinates = make_table(mapping)
+    # x = plot_year_area_count(df)
+    # x2 = plot_hist_kde(df)
+    #
+    # filename = '../data/OSMPPrairieDogColonies.kmz'
+    #
+    # kmz = ZipFile(filename, 'r')
+    # kml = kmz.open('doc.kml', 'r')
+    #
+    # parser = xml.sax.make_parser()
+    # handler = PlacemarkHandler()
+    # parser.setContentHandler(handler)
+    # parser.parse(kml)
+    # kmz.close
+    #
+    # mapping = handler.mapping
+    # areas, coordinates = make_table(mapping)

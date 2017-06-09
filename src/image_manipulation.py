@@ -61,46 +61,47 @@ def make_small_image(filepath, outfile_path):
 
     return images
 
-def produce_images(images, outfile_path):
+def produce_images(outfile_path):
     '''
     Takes in an iterable of imgaes and rotates or mirrors the images to produce additional trainable images. Only for training images!
 
     Input: Iterable of image file names and filepath to add them to
     Output: Additonal images to train models on
     '''
-    X_train, X_test = train_test_split(images, test_size=.20, random_state=6)
+    image_files = os.listdir(outfile_path)
+    X_train, X_test = train_test_split(image_files, test_size=.20, random_state=6)
 
     X_train, validation = train_test_split(X_train, test_size = .20, random_state=6)
     X_train_ = X_train
+    print(X_train)
 
-    for p in X_train:
-        new_p = p.split('.')
-
-        im = Image.open(outfile_path + '/'+p)
-        m = PIL.ImageOps.mirror(im)
-        new_m = new_p[0] + '-' + 'm' + '.' + new_p[1]
-        m.save(outfile_path+'/'+new_m)
-        m1 = m.rotate(90)
-        new_m1 = new_p[0] + '-' + 'm1' + '.' + new_p[1]
-        m1.save(outfile_path+'/'+new_m1)
-        m2 = m.rotate(180)
-        new_m2 = new_p[0] + '-' + 'm2' + '.' + new_p[1]
-        m2.save(outfile_path+'/'+new_m2)
-        m3 = m.rotate(270)
-        new_m3 = new_p[0] + '-' + 'm3' + '.' + new_p[1]
-        m3.save(outfile_path+'/'+new_m3)
-
-        r1 = im.rotate(90)
-        new_r1 = new_p[0] + '-' + 'r1' + '.' + new_p[1]
-        r1.save(outfile_path+'/'+new_r1)
-        r2 = im.rotate(180)
-        new_r2 = new_p[0] + '-' + 'r2' + '.' + new_p[1]
-        r2.save(outfile_path+'/'+new_r2)
-        r3 = im.rotate(270)
-        new_r3 = new_p[0] + '-' + 'r3' + '.' + new_p[1]
-        r3.save(outfile_path+'/'+new_r3)
-
-        X_train_.extend([m, m1, m2, m3, r1, r2, r3])
+    # for p in X_train:
+    #     im = Image.open(outfile_path + '/'+p)
+    #     m = PIL.ImageOps.mirror(im)
+    #     new_p = p.split('.')
+    #     new_m = new_p[0] + '-' + 'm' + '.' + new_p[1]
+    #     m.save(outfile_path+'/'+ new_m)
+    #     m1 = m.rotate(90)
+    #     new_m1 = new_p[0] + '-' + 'm1' + '.' + new_p[1]
+    #     m1.save(outfile_path+'/'+ new_m1)
+    #     m2 = m.rotate(180)
+    #     new_m2 = new_p[0] + '-' + 'm2' + '.' + new_p[1]
+    #     m2.save(outfile_path+'/'+ new_m2)
+    #     m3 = m.rotate(270)
+    #     new_m3 = new_p[0] + '-' + 'm3' + '.' + new_p[1]
+    #     m3.save(outfile_path+'/'+ new_m3)
+    #
+    #     r1 = im.rotate(90)
+    #     new_r1 = new_p[0] + '-' + 'r1' + '.' + new_p[1]
+    #     r1.save(outfile_path+'/'+new_r1)
+    #     r2 = im.rotate(180)
+    #     new_r2 = new_p[0] + '-' + 'r2' + '.' + new_p[1]
+    #     r2.save(outfile_path+'/'+ new_r2)
+    #     r3 = im.rotate(270)
+    #     new_r3 = new_p[0] + '-' + 'r3' + '.' + new_p[1]
+    #     r3.save(outfile_path+'/'+ new_r3)
+    #
+    #     X_train_.extend([m, m1, m2, m3, r1, r2, r3])
 
     return X_train_, X_test, validation
 
@@ -111,6 +112,7 @@ def produce_images(images, outfile_path):
 if __name__ == '__main__':
     # x = crop_image('../images/Jafay', '../images/cropped_Jafay')
     images = \
-    make_small_image('../../images/cropped_Jafay', '../../Capstone_images/NN_ready_images')
+    make_small_image('../../Capstone_images/cropped_Jafay', '../../Capstone_images/NN_ready_images')
 
-    X_train, X_test, validation = produce_images(images, '../../Capstone_images/NN_ready_images')
+
+    # X_train, X_test, validation = produce_images('../../Capstone_images/NN_ready_images/training_images')
