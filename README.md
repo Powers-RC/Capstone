@@ -1,9 +1,7 @@
-<<<<<<< HEAD
+
 Black-tailed Boundaries
 =======================
-=======
-# Black-tailed Boundries
->>>>>>> 50cb5f5e9f42c19780a3f0730b3b24b8df9d9763
+
 
  Table of contents
  -----------------
