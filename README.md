@@ -9,7 +9,7 @@ Black-tailed Boundaries
 2. Data
 3. EDA
 4. Data Collection
-5. Data Processing
+5. Image Processing
 6. Model Selection
 
 
@@ -39,8 +39,12 @@ I did minimal exploratory data analysis on the data set because my project is mo
 
 Data Collection
 ---------------
-In order to identify prairie dog mounds via aerial images....I need aerial imagery. So I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once the page was fully loaded the program would take a screen shot of the location, this process was repeated as necessary.  
+In order to identify prairie dog mounds via aerial images....I need aerial imagery. So I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location, this process was repeated as necessary until the whole colony area was accounted for.  
 
 ![GE gif](images/ge_gif.gif)
+
+Image Processing
+----------------
+The raw images received were 1440 x 703 pixels, these images were then cropped, removing any edging or unwanted icons and again to produce square 226 x 226 images. 
 
 [1] http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0075229

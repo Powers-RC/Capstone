@@ -1,12 +1,13 @@
 #water shed
 #blob detection skimage
+from classify_mounds import crop_mound
 from math import sqrt
 from skimage import data
 from skimage.feature import blob_dog, blob_log, blob_doh, canny
 from skimage.color import rgb2gray
 from skimage import exposure
 import matplotlib.pyplot as plt
-from collections import Counter
+from collections import Counter, defaultdict
 import operator
 from PIL import Image
 import numpy as np
@@ -39,54 +40,59 @@ def label_mounds(filepath, outfile_path):
 
     plt.close('all')
     images = os.listdir(filepath)[:-1]
-    print(images)
     # images = ['0-3.png']
-    blobcnt_dict = {}
+    blobInfo_dict = defaultdict(dict)
 
-    for p in images[:10]:
+    for p in images[:20]:
         im = Image.open(filepath + '/' + p)
         im.load()
         im_data = np.asarray(im)
         grey_im = rgb2gray(im_data)
+        gamma_corrected = exposure.adjust_gamma(grey_im, 5)
+        p2, p98 = np.percentile(gamma_corrected, (10, 98))
+        img_rescale = exposure.rescale_intensity(gamma_corrected, in_range=(p2, p98))
 
-        #adaptive equalization
-        img_adapteq = exposure.equalize_adapthist(grey_im, clip_limit=0.008)
+
+        #Laplacian of Gaussian (LoG) method
+        blobs_log = blob_log(img_rescale, min_sigma=2, max_sigma=10, threshold=.25, overlap=.1)
 
 
-        blobs_log = blob_log(img_adapteq, min_sigma=2.7, max_sigma=12, threshold=.18, num_sigma = 10, overlap=.2)
-
-        blobs_log = remove_errors(8, blobs_log)
+        # blobs_log = remove_errors(8, blobs_log)
 
         blobs_log[:, 2] = blobs_log[:, 2] * sqrt(2)
-        # blobs_log.
 
         blob_lst = blobs_log
-        color = 'lime'
-        title = 'Laplacian of Gaussian Blobbing'
 
-        order = zip(blob_lst, color, title)
-        f, ax = plt.subplots()
+        value = blobInfo_dict.get(p, None)
+        if value is None:
+            blobInfo_dict[p]['coordinates'] = blob_lst
 
-        ax.set_title(title)
-        ax.imshow(img_adapteq, interpolation='nearest')
-        for b in blob_lst:
-            y, x, r = b
-            c = plt.Circle((x,y), r, color=color, linewidth=2, fill=False)
-            ax.add_patch(c)
-        ax.set_axis_off()
+        # color = 'lime'
+        # title = 'Laplacian of Gaussian Blobbing'
+        #
+        # order = zip(blob_lst, color, title)
+        # f, ax = plt.subplots()
+        #
+        # ax.set_title(title)
+        # ax.imshow(im, interpolation='nearest')
+        # for b in blob_lst:
+        #     y, x, r = b
+        #     c = plt.Circle((x,y), r, color=color, linewidth=2, fill=False)
+        #     ax.add_patch(c)
+        # ax.set_axis_off()
+        #
+        # plt.tight_layout()
+        #
+        # if not os.path.exists(outfile_path):
+        #     os.makedirs(outfile_path)
+        #     plt.savefig(outfile_path+'/'+p)
+        # else:
+        #     plt.savefig(outfile_path+'/'+p)
 
-        plt.tight_layout()
-
-        if not os.path.exists(outfile_path):
-            os.makedirs(outfile_path)
-            plt.savefig(outfile_path+'/'+p)
-        else:
-            plt.savefig(outfile_path+'/'+p)
-
-        blobcnt_dict[p] = len(blob_lst)
 
 
-    return blobcnt_dict
+
+    return blobInfo_dict
 
 
 
@@ -94,4 +100,4 @@ def label_mounds(filepath, outfile_path):
 
 
 if __name__ == '__main__':
-    blob_cnts = label_mounds('../../Capstone_images/NN_ready_images', '../../Capstone_images/labeled_nn_images')
+    blobInfo_dict = label_mounds('../../Capstone_images/NN_ready_images', '../../Capstone_images/labeled_nn_images')
