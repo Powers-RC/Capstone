@@ -10,8 +10,8 @@ import pickle
 def labeler(dic):
     '''
     A Helper funtion to label the mound images( 1: mound, 0: not_mound) as they appear and save them to a dictionary.
-    input: a list of images
-    output list of list containting labels for each mound
+    input: dic
+    output: Pickeled dictionary containing labels for each mound
     '''
     image_lst = dic.keys()
 
@@ -32,7 +32,9 @@ def labeler(dic):
                 print(label_input)
                 if label_input == 1 or label_input == 0:
                     print("You entered a proper value!")
+                    print('You have {} left to label for this image.'.format(len(im_lst)-(i+1)))
                     dic[image]['label'].append(label_input)
+                    print(dic[image]['label'])
                     break
                 elif label_input != 1 or label_input != 0:
                     print("This value has to be entered as a 1 or a 0.")
@@ -78,7 +80,7 @@ def crop_mound(image_lst, dic, filepath):
 
         #this will be where your model is sent the images to classify and will return the new list of blob coordinates.
 
-        return dic
+    return dic
 
 
 
