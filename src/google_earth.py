@@ -72,7 +72,7 @@ def parse_area(max_lat, min_lat, max_lon, min_lon):
 
     #https://spie.org/membership/spie-professional-magazine/spie-professional-archives-and-special-content/2016_october_archive/optics-of-google-earth
 
-    #https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
+    #lhttps://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
 
 
     # max_lat, min_lat, max_lon, min_lon = float(max_lat), float(min_lat), float(max_lon), float(min_lon)

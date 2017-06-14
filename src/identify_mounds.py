@@ -43,7 +43,7 @@ def label_mounds(filepath, outfile_path):
     # images = ['0-3.png']
     blobInfo_dict = defaultdict(dict)
 
-    for p in images[:20]:
+    for p in images[:10]:
         im = Image.open(filepath + '/' + p)
         im.load()
         im_data = np.asarray(im)
