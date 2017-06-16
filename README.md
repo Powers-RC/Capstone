@@ -54,6 +54,18 @@ The raw images received were 1440 x 703 pixels, these images were then cropped, 
 
 These images were adjusted in order to make the prairie dog mounds more apparent. This was accomplished using gamma correction to brighten the image, making the pixel distribution smaller then stretching these values to the full extent of the pixel intensity range via contrast stretching. Then LoG blob detection method was used to find the blobs of these adjusted images.
 
-The LoG blob technique returned a central pixel coordinate value for each blob. Using these locations I cropped out 16x16 images and labeled each of these images as prairie dog mound or not prairie dog mounds. I decided on the image size by noticing the mound sizes seemed to vary between 5 and 15 pixels. I wanted to encompass as much of the mound as possible without to much background noise. 
+The LoG blob technique returned a central pixel coordinate value for each blob. Using these locations I cropped out 16x16 images and labeled each of these images as prairie dog mound or not prairie dog mounds. I decided on the image size by noticing the mound sizes seemed to vary between 5 and 15 pixels. I wanted to encompass as much of the mound as possible without to much background noise.
+
+Model Selection
+---------------
+Base model for mound classification:
+batch_size = 128
+nb_epochs = 12
+nb_filters = 32
+activation func = relu
+optimizer = Adadelta
+
+Test score: 0.490175707065
+Test accuracy: 0.789743589744
 
 [1] http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0075229

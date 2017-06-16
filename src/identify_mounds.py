@@ -1,6 +1,6 @@
 #water shed
 #blob detection skimage
-from classify_mounds import crop_mound
+from train_classifier import crop_mound
 from math import sqrt
 from skimage import data
 from skimage.feature import blob_dog, blob_log, blob_doh, canny
@@ -32,18 +32,18 @@ def remove_errors(frequency, blobs):
         return blobs_
 
 
-def label_mounds(filepath, outfile_path):
+def label_blobs(filepath, outfile_path=None):
     '''
-    input: The filepath where the images live and outfile_path where label images are sent
+    input: The filepath where the images live and outfile_path where label images are sent if you need the images saved.
     output: New labeled images
     '''
 
     plt.close('all')
-    images = os.listdir(filepath)[:-1]
+    images = os.listdir(filepath)
     # images = ['0-3.png']
     blobInfo_dict = defaultdict(dict)
 
-    for p in images[:10]:
+    for p in images:
         im = Image.open(filepath + '/' + p)
         im.load()
         im_data = np.asarray(im)

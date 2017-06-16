@@ -5,7 +5,6 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import os
 
-
 def crop_image(filepath, outfile_path):
     '''
     This function is designed to crop screenshot images to produce the raw image.
@@ -14,7 +13,8 @@ def crop_image(filepath, outfile_path):
     output: Saves cropped images to the outfile path argument
     '''
 
-    image_files = os.listdir(filepath)
+    # image_files = os.listdir(filepath)
+    image_files = ['12.png']
     for p in image_files:
         im = Image.open(filepath+'/'+p)
         c_im = im.crop((56, 0, 1186, 679))
@@ -110,9 +110,9 @@ def produce_images(outfile_path):
 
 
 if __name__ == '__main__':
-    # x = crop_image('../images/Jafay', '../images/cropped_Jafay')
-    images = \
-    make_small_image('../../Capstone_images/cropped_Jafay', '../../Capstone_images/NN_ready_images')
+    x = crop_image('../../Capstone_images/Jafay', '../../Capstone_images/cropped_Jafay')
+    # images = \
+    # make_small_image('../../Capstone_images/cropped_Jafay', '../../Capstone_images/NN_ready_images')
 
 
     # X_train, X_test, validation = produce_images('../../Capstone_images/NN_ready_images/training_images')
