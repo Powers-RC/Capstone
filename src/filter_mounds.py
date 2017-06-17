@@ -53,6 +53,6 @@ if __name__ == '__main__':
     # #
     # y = predict_labels(dict_data, model)
 
-    labeled_dict = pickle.load(open('../data/labeled_dict.pkl', 'rb'))
-    #
-    d = remove_blobObj(labeled_dict)
+    # labeled_dict = pickle.load(open('../data/labeled_dict.pkl', 'rb'))
+    # #
+    # d = remove_blobObj(labeled_dict)
