@@ -78,9 +78,9 @@ def parse_area(max_lat, min_lat, max_lon, min_lon):
     # max_lat, min_lat, max_lon, min_lon = float(max_lat), float(min_lat), float(max_lon), float(min_lon)
     coordinates = ['{},{}'.format(max_lat, max_lon)]
     new_lat, new_lon = max_lat, max_lon
-    map_unit = .319444
-    h_offset = 720 * map_unit
-    v_offset = 237 * map_unit
+    map_unit = .19166667 #scale: 23m/i , PPI: 120p/i
+    h_offset = 720 * map_unit #corrected val = 1130
+    v_offset = 237 * map_unit #corrected val = 679
     R = 6378137
 
     while new_lat >= min_lat:

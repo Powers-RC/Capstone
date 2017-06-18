@@ -20,22 +20,22 @@ def stitch_resize():
         for im in sorted_imgs:
             print('../../Capstone_images/cropped_Jafay/' + im)
             im = Image.open('../../Capstone_images/cropped_Jafay/' + im)
-            crop = im.crop((0,0,1130, 494))
-            img = crop.resize((1130, 679), Image.ANTIALIAS)
+            # crop = im.crop((0,0,1130, 494))
+            # img = crop.resize((1130, 679), Image.ANTIALIAS)
             if x <= 7910:
-                new_image.paste(img, (x, y))
+                new_image.paste(im, (x, y))
                 x += 1130
                 im_count += 1
                 print('Top if statement')
             elif x == 9040:
-                new_image.paste(img, (x,y))
+                new_image.paste(im, (x,y))
                 x = 0
                 y += 679
                 im_count += 1
                 print('Bottom if statement')
 
 
-    new_image.save('../images/jafay_area.png')
+    new_image.save('../images/jafay_area_2.png')
 #had to crop becuase shifting was off, need to readjust.
 if __name__ == '__main__':
     pickle.load(open('../data/corr_coor_dict.pkl', 'rb'))
