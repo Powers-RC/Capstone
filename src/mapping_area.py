@@ -31,7 +31,7 @@ def plot_points(lst, image, outfile_path):
     order = zip(lst, color, title)
     f, ax = plt.subplots()
 
-    ax.set_title(title)
+    # ax.set_title(title)
     ax.imshow(im, interpolation='nearest')
     for c in lst:
         x, y = c
@@ -95,6 +95,6 @@ def cluster_mounds(lst, image):
 if __name__ == '__main__':
     area_dict = pickle.load(open('../data/corr_coor_dict.pkl', 'rb'))
     coordinate_lst = combine_points(area_dict)
-    # plot_points(coordinate_lst, '../images/jafay_area.png', '../images/')
+    plot_points(coordinate_lst, '../images/jafay_area.png', '../images/')
 
-    cluster_mounds(coordinate_lst, '../images/jafay_area.png')
+    # cluster_mounds(coordinate_lst, '../images/jafay_area.png')

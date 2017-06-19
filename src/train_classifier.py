@@ -13,7 +13,8 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from sklearn.metrics import confusion_matrix
-
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_curve, auc
 
 
 def labeler(dic):
@@ -166,6 +167,78 @@ def train_nomound_mound(dic):
     #
     # print('The number of mounds in test set is: {}'.format(sum(y_test)))
 
+def plot_roc(dic):
+    X = []
+    y = []
+    X_ = []
+    for im in dic:
+        X.extend(dic[im]['img_lst'])
+        y.extend(dic[im]['label'])
+    for im in X:
+        arr = imread(im)
+        X_.append(arr)
+        len_X = len(X_)
+
+    X_ = (np.array(X_).reshape(len_X, 4, 16, 16)/255).astype('float32')
+    y = np.array(y).astype('float32')
+
+    X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify = y)
+
+    model = Sequential()
+
+    batch_size = 20
+    nb_epoch = 20
+
+    nb_filters = 300 #neurons
+    kernel_size = (3, 3)
+    input_shape = (4, 16, 16)
+
+
+    model.add(Convolution2D(nb_filters, (kernel_size[0], kernel_size[1]), input_shape=input_shape, kernel_initializer='TruncatedNormal'))
+    model.add(Activation('relu'))
+
+
+    # model.add(Dropout(0.5))
+    model.add(Flatten())
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(.3))
+    model.add(Dense(1, activation='sigmoid'))
+
+    model.compile(loss = 'binary_crossentropy', optimizer='Adamax', metrics=['accuracy'])
+
+
+    model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch, verbose=1, validation_data=(X_test, y_test))
+
+    y_predict = model.predict_proba(X_test, batch_size=batch_size)
+    score = roc_auc_score(y_test, y_predict)
+    print(score)
+
+    #compute curve are area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    n_classes = 1
+
+    fpr, tpr, _ = roc_curve(y_test, score)
+    roc_auc[i] = auc(fpr, tpr)
+
+    # Compute micro-average ROC curve and ROC area
+    fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
+    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+    plt.figure()
+    lw = 2
+    plt.plot(fpr, tpr, color='darkorange',
+             lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[2])
+    plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic example')
+    plt.legend(loc="lower right")
+    plt.show()
+
 
 
 
@@ -190,4 +263,6 @@ if __name__ == '__main__':
     # labeler(blobTraindict, img_lst)
 
     blobTraindict = pickle.load(open('../data/label_data2.pkl', 'rb'))
-    train_nomound_mound(blobTraindict)
+    # train_nomound_mound(blobTraindict)
+
+    # plot_roc(blobTraindict)

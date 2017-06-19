@@ -39,8 +39,8 @@ def label_blobs(filepath, outfile_path=None):
     '''
 
     plt.close('all')
-    images = os.listdir(filepath)
-    # images = ['0-3.png']
+    # images = os.listdir(filepath)
+    images = ['0-0.png']
     blobInfo_dict = defaultdict(dict)
 
     for p in images:
@@ -54,7 +54,7 @@ def label_blobs(filepath, outfile_path=None):
 
 
         #Laplacian of Gaussian (LoG) method
-        blobs_log = blob_log(img_rescale, min_sigma=2, max_sigma=10, threshold=.25, overlap=.1)
+        blobs_log = blob_log(img_rescale, min_sigma=2, max_sigma=10, threshold=.35, overlap=.1)
 
 
         # blobs_log = remove_errors(8, blobs_log)
@@ -62,37 +62,40 @@ def label_blobs(filepath, outfile_path=None):
         blobs_log[:, 2] = blobs_log[:, 2] * sqrt(2)
 
         blob_lst = blobs_log
+        print(blob_lst)
 
-        value = blobInfo_dict.get(p, None)
-        if value is None:
-            blobInfo_dict[p]['coordinates'] = blob_lst
+        # value = blobInfo_dict.get(p, None)
+        # if value is None:
+        #     blobInfo_dict[p]['coordinates'] = blob_lst
 
-        # color = 'lime'
-        # title = 'Laplacian of Gaussian Blobbing'
-        #
-        # order = zip(blob_lst, color, title)
-        # f, ax = plt.subplots()
-        #
+        color = 'lime'
+        title = 'Laplacian of Gaussian Blobbing'
+
+        order = zip(blob_lst, color, title)
+        f, ax = plt.subplots()
+
         # ax.set_title(title)
-        # ax.imshow(im, interpolation='nearest')
-        # for b in blob_lst:
-        #     y, x, r = b
-        #     c = plt.Circle((x,y), r, color=color, linewidth=2, fill=False)
-        #     ax.add_patch(c)
-        # ax.set_axis_off()
-        #
-        # plt.tight_layout()
-        #
-        # if not os.path.exists(outfile_path):
-        #     os.makedirs(outfile_path)
-        #     plt.savefig(outfile_path+'/'+p)
-        # else:
-        #     plt.savefig(outfile_path+'/'+p)
+        ax.imshow(im, interpolation='nearest')
+        for b in blob_lst:
+            y, x, r = b
+            c = plt.Circle((x,y), r, color=color, linewidth=2, fill=False)
+            ax.add_patch(c)
+        ax.set_axis_off()
+
+        plt.tight_layout()
+        # plt.show()
+
+        if not os.path.exists(outfile_path):
+            os.makedirs(outfile_path)
+            plt.savefig('~/Desktop/Presentation_real_image.png')
+        else:
+            plt.savefig('~/Desktop/Presentation_real_image.png')
 
 
 
 
-    return blobInfo_dict
+
+    # return blobInfo_dict
 
 
 
@@ -100,4 +103,4 @@ def label_blobs(filepath, outfile_path=None):
 
 
 if __name__ == '__main__':
-    blobInfo_dict = label_mounds('../../Capstone_images/NN_ready_images', '../../Capstone_images/labeled_nn_images')
+    blobInfo_dict = label_blobs('../../Capstone_images/NN_ready_images', '~/Desktop/')

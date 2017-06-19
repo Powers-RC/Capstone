@@ -77,6 +77,7 @@ def calculate_metrics(lst, polygon, image):
     print(acre)
     p_perimeter = shape(polygon).length
     perimeter = p_perimeter * map_unit
+    print perimeter 
 
 
     p = 'area_labeled.png'
@@ -101,8 +102,8 @@ def calculate_metrics(lst, polygon, image):
     ax.set_axis_off()
 
     plt.tight_layout()
-    plt.show()
-    # plt.savefig('../images/jafay_poly.png')
+    # plt.show()
+    plt.savefig('../images/jafay_poly.png')
 
 
 
