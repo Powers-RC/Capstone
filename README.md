@@ -39,6 +39,8 @@ EDA
 ---
  The number of colonies tracking by Boulder and OSMP have increase by over 700% since this project began. If I have enough time I would like to look at area/perimeter fluctuation over the 21 years.
 
+[Check out my Tableau workbook here! Boulder Prairie Dog Acreage Over Time](https://public.tableau.com/views/Boulder_prairie_dog_areas/Dashboard1?:embed=y&:display_count=yes)
+
 ![Annual area numbers](images/colony_growth.png)
 
 
@@ -47,10 +49,6 @@ Data Collection
 In order to identify prairie dog mounds via aerial images.... I need aerial imagery. So I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location, this process was repeated as necessary until the whole colony area was traversed.  
 
 ![GE gif](images/ge_gif.gif)
-
-[Check out my Tableau workbook here! Boulder Prairie Dog Acreage Over Time](https://public.tableau.com/views/Boulder_prairie_dog_areas/Dashboard1?:embed=y&:display_count=yes)
-
-
 
 
 Image Processing
