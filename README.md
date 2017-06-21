@@ -5,16 +5,16 @@ Black-tailed Boundaries
 
  Table of contents
  -----------------
-1. [Project Motivation](#Motivation)
+1. [Project Motivation](motivation)
 2. Project Process
-3. Data
+3. [Data](data)
 4. EDA
 5. Data Collection
 6. Image Processing
 7. Model Selection
 
 
-Motivation
+[Motivation](#motivation)
 ----------
  I have always been fascinated by Ecology and biodiversity, so when presented with an opportunity to work with prairie dog data I jumped at the chance. Prairie dogs are a keystone species which play a vital role in maintaining North American grasslands ecosystems and there is clear correlation between their prosperity and biodiversity. They also provide drastically important ecosystem services, such as groundwater recharge, regulation of soil erosion, soil carbon storage and more[1]. Annually Ecologist with Open Space Mountain Parks (OSMP) map prairie dog colonies within the county of Boulder, measuring the area and perimeter of each active colony. The goal of this project is to automate the ground mapping and data collection done annually by OSMP. I am hoping this project will benefit Ecologist by eliminating the need to do lengthly ground surveys, saving time to allow for other areas of focus without the loss of important annual data.
 
@@ -22,7 +22,7 @@ Motivation
  -------
  The final goal of this project is to develop a program that, given aerial photos of a prairie dog colony could predict the area and perimeter for that colony. So how did I go about do that? I produced images, broke them down, used blob detection to find blobs in these images. Then identified which blobs were prairie dog mounds using a CNN classifier. This CNN is then used to label blobs that are mounds. These labeled blobs are then used to train a final CNN to predict which pixels are mounds in new images. Once the mounds are identified I can use shapely(or other method) to predict the area
 
-Data
+[Data](#data)
 ----
 Each fall Ecologists with Open Space Mountain Parks map the perimeter of each colony which provides data on the extent of the colony. Both the CSV and KMZ files were use to obtain annual colony and spatial data.
 
