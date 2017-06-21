@@ -4,7 +4,6 @@ import random
 import scipy
 import scipy.spatial
 from scipy.spatial import Delaunay
-import networkx as nx
 import shapely
 import shapely.geometry as geometry
 import matplotlib
@@ -77,7 +76,7 @@ def calculate_metrics(lst, polygon, image):
     print(acre)
     p_perimeter = shape(polygon).length
     perimeter = p_perimeter * map_unit
-    print perimeter 
+    print perimeter
 
 
     p = 'area_labeled.png'

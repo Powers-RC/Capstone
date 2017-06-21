@@ -101,6 +101,7 @@ def crop_mound(dic, filepath, outfile_path):
 
 
 def train_nomound_mound(dic):
+    plt.close('all')
     X = []
     y = []
     X_ = []
@@ -115,129 +116,76 @@ def train_nomound_mound(dic):
     X_ = (np.array(X_).reshape(len_X, 4, 16, 16)/255).astype('float32')
     y = np.array(y).astype('float32')
 
-    X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify = y)
+    X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify = y, random_state=6)
+    num_filters = [10, 50, 100, 175, 250, 300, 350]
+    precision_for_filters = []
+    recall_for_filters = []
+    for fil in num_filters:
 
-    model = Sequential()
+        model = Sequential()
 
-    batch_size = 20
-    nb_epoch = 20
+        batch_size = 20
+        nb_epoch = 20
 
-    nb_filters = 300 #neurons
-    kernel_size = (3, 3)
-    input_shape = (4, 16, 16)
-
-
-    model.add(Convolution2D(nb_filters, (kernel_size[0], kernel_size[1]), input_shape=input_shape, kernel_initializer='TruncatedNormal'))
-    model.add(Activation('relu'))
-
-
-    # model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(.3))
-    model.add(Dense(1, activation='sigmoid'))
-
-    model.compile(loss = 'binary_crossentropy', optimizer='Adamax', metrics=['accuracy'])
+        nb_filters = fil #neurons #150
+        kernel_size = (3, 3)
+        input_shape = (4, 16, 16)
+        pool_size =(2, 2)
 
 
-    model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch, verbose=1, validation_data=(X_test, y_test))
-
-    filename = '../data/mound_classifier.HDF5'
-    model.save(filename)
-
-    # score = model.evaluate(X_test, y_test, verbose=0)
-
-    # print('Test score:', score[0])
-    # print('Test accuracy:', score[1])
-    #
-    # y_predict = model.predict_classes(X_test, batch_size=batch_size)
-    #
-    # conf_mat = confusion_matrix(y_test, y_predict)
-    # print(conf_mat)
-    #
-    # precision = conf_mat[1,1]/ (conf_mat[1,1] +conf_mat[0,1])
-    # print('Precision, PPV: {}'.format(precision))
-    #
-    # recall = conf_mat[1,1]/(conf_mat[1,1] + conf_mat[1,0 ])
-    # print('Recall, TPR: {}'.format(recall))
-    #
-    # #weighted average of percision and recall
-    # f1_score = 2 * (precision * recall)/(precision + recall)
-    # print('The F1_score for this model is {}'.format(f1_score))
-    #
-    # print('The number of mounds in test set is: {}'.format(sum(y_test)))
-
-def plot_roc(dic):
-    X = []
-    y = []
-    X_ = []
-    for im in dic:
-        X.extend(dic[im]['img_lst'])
-        y.extend(dic[im]['label'])
-    for im in X:
-        arr = imread(im)
-        X_.append(arr)
-        len_X = len(X_)
-
-    X_ = (np.array(X_).reshape(len_X, 4, 16, 16)/255).astype('float32')
-    y = np.array(y).astype('float32')
-
-    X_train, X_test, y_train, y_test = train_test_split(X_, y, stratify = y)
-
-    model = Sequential()
-
-    batch_size = 20
-    nb_epoch = 20
-
-    nb_filters = 300 #neurons
-    kernel_size = (3, 3)
-    input_shape = (4, 16, 16)
+        model.add(Convolution2D(nb_filters, (kernel_size[0], kernel_size[1]), input_shape=input_shape, kernel_initializer='TruncatedNormal'))
+        model.add(Activation('relu'))
+        model.add(MaxPooling2D(pool_size=pool_size))
 
 
-    model.add(Convolution2D(nb_filters, (kernel_size[0], kernel_size[1]), input_shape=input_shape, kernel_initializer='TruncatedNormal'))
-    model.add(Activation('relu'))
+        # model.add(Dropout(0.5))
+        model.add(Flatten())
+        model.add(Dense(64, activation='relu'))
+        model.add(Dropout(.3))
+        model.add(Dense(1, activation='sigmoid'))
+
+        model.compile(loss = 'binary_crossentropy', optimizer='Adamax', metrics=['accuracy'])
 
 
-    # model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(.3))
-    model.add(Dense(1, activation='sigmoid'))
+        model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch, verbose=1, validation_data=(X_test, y_test))
 
-    model.compile(loss = 'binary_crossentropy', optimizer='Adamax', metrics=['accuracy'])
+        # filename = '../data/mound_classifier.HDF5'
+        # model.save(filename)
 
 
-    model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch, verbose=1, validation_data=(X_test, y_test))
 
-    y_predict = model.predict_proba(X_test, batch_size=batch_size)
-    score = roc_auc_score(y_test, y_predict)
-    print(score)
+        score = model.evaluate(X_test, y_test, verbose=1)
 
-    #compute curve are area for each class
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-    n_classes = 1
+        print('Test score:', score[0])
+        print('Test accuracy:', score[1])
 
-    fpr, tpr, _ = roc_curve(y_test, score)
-    roc_auc[i] = auc(fpr, tpr)
+        y_predict = model.predict_classes(X_test, batch_size=batch_size)
 
-    # Compute micro-average ROC curve and ROC area
-    fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
-    roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+        conf_mat = confusion_matrix(y_test, y_predict)
+        print(conf_mat)
 
-    plt.figure()
-    lw = 2
-    plt.plot(fpr, tpr, color='darkorange',
-             lw=lw, label='ROC curve (area = %0.2f)' % roc_auc[2])
-    plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic example')
-    plt.legend(loc="lower right")
-    plt.show()
+        precision = conf_mat[1,1]/ (conf_mat[1,1] +conf_mat[0,1])
+        precision_for_filters.append(precision)
+        print('Precision, PPV: {}'.format(precision))
+
+        recall = conf_mat[1,1]/(conf_mat[1,1] + conf_mat[1,0 ])
+        recall_for_filters.append(recall)
+        print('Recall, TPR: {}'.format(recall))
+
+        #weighted average of percision and recall
+        f1_score = 2 * (precision * recall)/(precision + recall)
+        print('The F1_score for this model is {}'.format(f1_score))
+
+        print('The number of mounds in test set is: {}'.format(sum(y_test)))
+
+
+    plt.plot(num_filters, precision_for_filters, 'r-')
+    plt.plot(num_filters, recall_for_filters, 'b-')
+    plt.xlabel("Number of Filters")
+    plt.ylabel('Decimal Percent')
+    plt.title('How Filter Numbers Effect Precision & Recall')
+    plt.savefig('../images/PR_filters.png')
+
 
 
 
@@ -263,6 +211,6 @@ if __name__ == '__main__':
     # labeler(blobTraindict, img_lst)
 
     blobTraindict = pickle.load(open('../data/label_data2.pkl', 'rb'))
-    # train_nomound_mound(blobTraindict)
+    precision = train_nomound_mound(blobTraindict)
 
     # plot_roc(blobTraindict)
