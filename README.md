@@ -12,6 +12,11 @@ Black-tailed Boundaries
 5. [Data Collection](#data-collection)
 6. [Image Processing](#image-processing)
 7. [Model Selection](#model-selection)
+8. [My CNN](#my-cnn)
+9. [Model Results](#model-results)
+10. [Mapping & Predicting Acreage](#mapping-predicting-acreage)
+11. [My Results](#my-results)
+12. [Next Steps](#next-steps)
 
 
 Motivation
@@ -20,7 +25,7 @@ Motivation
 
  Project Process
  -------
- The final goal of this project is to develop a program that, given aerial photos of a prairie dog colony could predict the area in acreage for that colony. So how did I go about do that? I produced images, processed them, used blob detection to find blobs in these images. Then identified which blobs were prairie dog mounds by developing a CNN classifier. This CNN is then used to label blobs that are mounds. These labeled blobs that are identified as prairie dog mounds are mapped over the area of interest. Once mapped I used shapely to predict the acreage.
+ The final goal of this project is to develop a program that, given aerial photos of a prairie dog colony could predict the area in acreage for that colony. So how did I go about do that? I produced images, processed them, used blob detection to find blobs in these images. Then identified which blobs were prairie dog mounds by developing a CNN classifier. This CNN is then used to label blobs that are mounds. These labeled blobs that are identified as prairie dog mounds are mapped over the area of interest. Once mapped I used shapely to predict the acreage. A
 
 Data
 ----
@@ -37,7 +42,7 @@ The Boulder prairie dog data contains:
 
 EDA
 ---
- The number of colonies tracking by Boulder and OSMP have increase by over 700% since this project began. The Tableau workbook below looks at acreage fluctuation for the different areas since 1996.
+ The number of colonies tracking by Boulder and OSMP have increase by over 700% since this project began. My Tableau workbook below looks at acreage fluctuations for the different areas since 1996.
 
 [Check out my Tableau workbook here! Boulder Prairie Dog Acreage Over Time](https://public.tableau.com/views/Boulder_prairie_dog_areas/Dashboard1?:embed=y&:display_count=yes&publish=yes)
 
@@ -46,35 +51,34 @@ EDA
 
 Data Collection
 ---------------
-In order to identify prairie dog mounds via aerial images.... I need aerial imagery. So I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location, this process was repeated as necessary until the whole colony area was traversed.  
+In order to identify prairie dog mounds.... I need aerial imagery. So I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location. This process was repeated as necessary until the whole colony area was traversed.  
 
 ![GE gif](images/ge_gif.gif)
 
 
 Image Processing
 ----------------
-The raw images received were 1440 x 703 pixels, these images were then cropped, removing any edging or unwanted icons. This clean raw image was cropped again to produce square 226 x 226 images so I could visibly identify mounds and so the number of mounds in the image was not overwhelming. Most of this work was done using a handy dandy Python library known as PIL.
+The raw images received were 1440 x 703 pixels. These images were then cropped to remove any edging or unwanted icons. This clean raw image was cropped again to produce square 226 x 226 images. I wanted the mounds to be visibly identifiable and have the number of mounds that was not overwhelming. Most of this work was done using a handy dandy Python library known as PIL.
 
-![Image Porcessing](images/image-processing.png)
-<!-- .element height="50%" width="50%" -->
+![Image Porcessing](images/image_processing.png)
 
 These images were adjusted in order to make the prairie dog mounds more apparent. This was accomplished using gamma correction which transformed the pixel intensities onto a smaller range, compressing them. Next contrast stretching was applied to these values extending the small range of transformed pixel intensities to the full extent of possible pixel intensities. Then Laplace of Gaussian(LoG) blob detection method was used to find the blobs of these adjusted images.
 
 ![Blob Detection](images/blob_detection.png)
 
-The LoG blob technique detects light on dark areas in an image. This is done with the use of a Gaussian kernel, which gives more weight to the pixels that  line up with the center of the kernel than the edges. The larger the standard deviation of this distribution the more smoothing occurs and visa versa. This blurred image has a Laplace operator applied to it resulting in positive responses for dark areas and negative for bright areas. A large gradient or change from light to dark as is used to determine the presence of a blob. In my this case I use a minimum sigma of 2, max of 10 and a threshold of 0.35. The threshold is telling the model to ignore any local maxima that is lower than 0.35, because remember our domain is between -1 and 1.  
+The LoG blob technique detects light on dark areas in an image. This is done with the use of a Gaussian kernel, which gives more weight to the pixels that line up with the center of the kernel than it does the edges. The larger the standard deviation of this distribution the more smoothing occurs and visa versa. This blurred image has a Laplace operator applied to it resulting in positive responses for dark areas and negative for bright areas. A large gradient or change from light to dark as is used to determine the presence of a blob. In my this case I use a minimum sigma of 2, max of 10 and a threshold of 0.35. The threshold is telling the model to ignore any local maxima that is lower than 0.35, because remember our domain is between -1 and 1.  
 
-The LoG blob technique returns a central pixel coordinate value for each blob. Using these locations for 20 different images I cropped out 16x16 images and labeled each of these as prairie dog mound or not prairie dog mounds. I decided on the image size by noticing the mound sizes seemed to vary between 5 and 15 pixels. I wanted to encompass as much of the mound as possible without to much background noise.
+The LoG blob technique returns a central pixel coordinate value for each blob. Using these locations for 20 different images I cropped out 16x16 images and labeled each of these as prairie dog mound or unknown object. I decided on the image size by noticing the mound sizes seemed to vary between 5 and 15 pixels. I wanted to encompass as much of the mound as possible without to much background noise.
 
-![An image](images/an_image.jpg) <!-- .element height="50%" width="50%" -->
+![An image](images/training_images.png)
 
 Model Selection
 ---------------
-During the program we learned about two possible methods for image recognition, Multilayer Perceptrons(MLP) and Convolutional Neural Networks(CNN). While MLP is a great supervised learning algorithm, it is also pretty standard. CNN's have been optimized to preform in areas such as image recognition. I chose to tackle an image recognition problem  using a CNN for my project because I felt in practice a majority of industries don't use CNN's and image recognition to solve their business problems.
+During the program we learned about two possible methods for image recognition, Multilayer Perceptrons(MLP) and Convolutional Neural Networks(CNN). While MLP is a great supervised learning algorithm, it is also pretty standard. CNN's have been optimized to preform in areas such as image recognition. I chose to tackle an image recognition problem using a CNN because it seemed like the only reasonable option to accomplish my goal. Also in practice a majority of industries don't use CNN's and image recognition to solve their business problems, so why not take the opportunity.
 
-I trained my CNN on 75% of the 1577(16x16) mound and not-mound images, then tested it on the other 25%. My classes were imbalance 1250:327, non-mound:mound. To solve this problem I stratified my data which is the process of dividing members of this data into homogenous subclass and drawing from them according to ratio as compared to the largest subpopulation.
+I trained my CNN on 75% of the 1577(16x16) unknown object and prairie dog mound images, then tested on the other 25%. My classes were imbalance 1250:327 respectively. To solve this problem I stratified my data which is the process of dividing members of this data into homogenous subclass and drawing from them according to ratio as compared to the largest subpopulation.
 
-I designed a base model to compare the performance of my newly designed models with varying hyperparameters, shown below.
+I designed a base model to compare the performance to any other models I developed with varying hyperparameters, shown below.
 
 |Model Hyperparameter   | Value   |
 |-----------------------|---------|
@@ -90,23 +94,12 @@ I designed a base model to compare the performance of my newly designed models w
 |0.4901       |0.7897          |0.4878       |0.6250   |
 
 
-Structure Defines Function
---------------------------
 
-So how do convolutional neural nets work? What is it that allows them to identify objects in an image? Read on to find out.
-
-I need to give you some background on how general neural net(NN) algorithms work. These NN's are fed some input data which is then transformed through a multiple hidden layers composed of neurons. Each neuron is connected to every other neuron in the previous layer but are completely disconnect from the neurons within the same hidden layer, and function autonomously. The final fully connected layer is known as the output layer which contains the results of your regression/classification.
-
-The reason NN's are suboptimal as compared to CNN's when dealing with imagery has to do with these fully connected layers. Each one of these neurons would have a total number of weights equal to the length times the width times the number of bands. Over numerous neurons this many weights will lead to overfitting.
-
-In a CNN the first layer is always a convolutional layer and this layer is traversed by a kernel/filter, which is generally square and much smaller than the image itself. This filter contains weights and as this filter transverses over the image, the forward feed calculations are preformed. This value is the beginning of a feature map, the corresponding value is computed by shifting the filter by defined unit. The process is continued until the whole image has been encompassed and repeated for a defined number of filters. Inner mixed in this is a process call backpropagation where we are trying to minimize our loss function by updating the weights every batch, increasing ones that have more of an impact on decreasing our loss function.   
-
-So what are these filters telling us? Each filter can be thought of as a feature identifier, looking for lines, edges, curves and colors. Each filter has different weights depending on the object it is trying to detect. So if the object is not present the summed value will be low and high if its present, showing us where there is a high likelihood of object being present. Image recognition!
-
-
+My Model
+---------
 ![CNN Example](images/cnn_example.jpg)
 
-Lets talk about the structure of my optimal CNN on a single image in the hopes of trying to predict if it contains a prairie dog mound or not; the hyperparameters are described in the table below.
+Lets talk about the structure of my optimal CNN, the hyperparameters are described in the table below.
 
 |Model Hyperparameter   | Value   |
 |-----------------------|---------|
@@ -117,26 +110,60 @@ Lets talk about the structure of my optimal CNN on a single image in the hopes o
 |optimizer              |Adamax   |
 
 
-Convolution begins by taking in a receptive field object that is 16x16x4 which then convoluted by 300 3x3 filters, producing 300 hundred different feature maps of size 14x14x4. The filter weights were initialized using a truncated normal distribution, meaning weights that are more than two standard deviations away from the mean are tossed out then redrawn. These feature maps are then flattened and passed into the activation function RELU(Rectified Linear Unit), this function transforms any negative in the matrix to zero while keeping the rest constant(image with embedded neurons).
+Convolution begins by taking in my receptive field object that is 16x16x4 which then convoluted by 250, 3x3 filters, producing 250 hundred different feature maps of size 14x14x4. The filter weights were initialized using a truncated normal distribution, meaning weights are larger toward the center and that any more than two standard deviations away from the mean are tossed out then redrawn.
+
+This forward process uses the activation function,RELU(Rectified Linear Unit), which transforms any negative in the matrix to zero while keeping the rest constant(image with embedded neurons). Afterwards the dimensional object is downsampled using maxpooling. A 2x2 filter is applied to the input volume and extracts the maximum value from the filter. The filter then shifts the dimension of the filter until the whole volume is covered. The downsampling process reduces the spatial size and the amount of parameters, which decreases the possibility of overfitting. This downsampling produces an value of images of size 4x4x4.
 
 I then use a dropout rate of 0.3, which randomly selects neurons to be dropped out at the set rate. This is a form of regularization because the neurons contribution to its downstream connected neighbors is disabled, helping to prevent overfitting.
 
-Last but not least this matrix is applied to a sigmoid function to produce the a vector of labels, 1 for a prairie dog mound and 0 for non-prairie dog mound. I used a threshold of 0.5 to assign the classifications.
+Last but not least this matrix is applied to a sigmoid function to produce the a vector of labels, 1 for a prairie dog mound and 0 for an unknown object. I used a threshold of 0.5 to assign these classifications.
 
-My model when through 20 epochs(forward pass and backpropagations) of all of the training samples. One training batch consisted of 20 samples so it took roughly 63 iterations to get through 1 epoch. A gradient descent optimizer called AdaMax was used which is a version of Adam(adaptive moment estimation) that produces adaptive learning rates for each parameter.    
+My model when through 20 epochs(forward pass and backpropagations) of all of the training samples. One training batch consisted of 20 samples so it took roughly 63 iterations to get through 1 epoch. A gradient descent optimizer called AdaMax was used which is a version of Adam(adaptive moment estimation) that produces adaptive learning rates for each parameter.  
 
-
-
-
-
-
+Model Results
+----------
+When I tested my model on the holdout set the times it predicted a prairie dog mound, it was correct 91% of the time. Out of all of the identifiable prairie dog mounds my model identified 24% of them. I was satisfied with this result because the objective of my CNN was to filter blobs that had identified unknown objects as prairie dog mound, only presenting to me locations of actual mounds.
 
 
+|Test Score   |Test Accuracy   | Precision   |Recall   |F1 Score   |
+|-------------|----------------|-------------|---------|-----------|
+|0.3788       |0.8379          |0.9090       |0.2439   |0.3846     |
+
+
+Mapping & Predicting Acreage
+----------------------------
+Using the known prairie dog mounds I was able to map their locations over the area and create a polygon object using Shapely. My polygon initially was very geometric in its shape, I needed to find a way to make the polygon shape more dynamic and complex to obtain a better area calculation. I found a great tutorial from Kevin Dwyer[2] on how to do this, below is the conceptual overview of how this was accomplished.
+
+![Mound Mapping](images/mounds_mapped.png)
+
+First I created Delaunay triangles which creates my polygon out planer triangles, with no point inside any triangle circumference. This process maximizes the minimum angle of all the triangles in the triangulation. Then using these triangle points I calculate the circumference for each triangle. Triangles that are too far from their neighbors are removed using a circumference specific as a threshold. After removing these triangles we are still left with an object that has edge points in the middle of our area. So I removed these inner edges to create my polygon object.
+
+
+My Results
+----------
+Using the polygon object from the previous section I was able to calculate the area in pixels squared, doing some unit conversion I calculated the acres for the Jafay prairie dog colony.
+
+|Predicted Acreage   |Test Acreage   |
+|--------------------|---------------|
+| 466.7              |261.8          |
+
+
+Next Steps
+----------
+My image shifts are slightly off and could be playing a large part in the acreage difference, I will make sure these shifts are exact and determine how this improves my calculated acreage. Currently I am using a single CNN. I want to develop a deep CNN in an attempt to improve my prairie dog mound classifier. I could also see some improvement in the classifier if I label more images and retrain my model. The last item I would like to develop is a class. Developing a class would allow me to create an instance for multiple prairie dog areas and provide functionality to predict the acreage for each one.  
+
+Thank you for reading!
 
 
 
 
 
 
+
+
+
+Resources:
 
 [1] http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0075229
+
+[2] http://blog.thehumangeo.com/2014/05/12/drawing-boundaries-in-python/
