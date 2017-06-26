@@ -18,6 +18,12 @@ from shapely.ops import cascaded_union, polygonize
 from PIL import ImageDraw
 
 def alpha_shapes(points, alpha):
+    '''
+    Create a polygon object from Delaunay triangles making the boundries more flexible
+    input: a list of all the coordinate tuple values and the alpha value that regulates the threshold of the circumference
+    output: returns a polygon object
+
+    '''
     plt.close('all')
     #http://blog.thehumangeo.com/2014/05/12/drawing-boundaries-in-python/
     if len(points) < 4:
@@ -25,6 +31,12 @@ def alpha_shapes(points, alpha):
         return polygon
 
     def add_edge(edges, edge_points, coords, i, j ):
+        '''
+        Adds edges and edge points to there respecive containers
+        input: the current containers of edges, edge points and points, along with the coordinate in question
+        output: None
+        '''
+
         if (i, j) in edges or (j, i) in edges:
             #point exits
             return
@@ -65,6 +77,11 @@ def alpha_shapes(points, alpha):
 
 
 def calculate_metrics(lst, polygon, image):
+    '''
+    Calculates the acreage of the area and graphs the points and the polygon for visualization
+    input: List of coodinates, polygon and the image
+    output: Image of the polygon and mapped prairie dog mounds
+    '''
 
     map_unit = 0.19166667 #meters/pixel
     yard_conv = 1.09361 # yards/meter

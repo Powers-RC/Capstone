@@ -9,6 +9,10 @@ import copy
 import pdb
 
 def predict_labels(dic, model):
+    ''' Predicts if the images passed into the model are a prairie dog mound or unknown object.
+    input: A dictionary contatining the filepath to the images you are trying to label
+    output: creates a pickle object contatining the dictionary with an added key for there labels and the values for each image
+    '''
 
     for im in dic:
         X = []
@@ -29,6 +33,11 @@ def predict_labels(dic, model):
     pickle.dump(dic, open('../data/labeled_dict.pkl', 'wb'))
 
 def remove_blobObj(dic):
+    ''' Removes any blob that was labeled as an unknown object
+    input: The dictionary produced by predict_labels function
+    output: A dictionary contatining only prairie dog mounds
+    '''
+    
     d = copy.deepcopy(dic)
     new_dic ={}
     for im in d:

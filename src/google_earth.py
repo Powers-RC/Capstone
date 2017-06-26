@@ -13,13 +13,6 @@ import csv
 import pdb
 import math
 
-def create_folders(coordinates):
-    for s in coordinates:
-        s = s.split(",")
-        name = s[0]
-        filepath = "../images/" + name
-        if not os.path.exists(filepath):
-            os.makedirs(filepath)
 
 def get_screen_res():
     '''
@@ -56,26 +49,15 @@ def take_area_photos(coordinates):
 
     driver.close()
 
-
-# https://earth.google.com/web/@40.07879835,-105.16907049,1615.82020731a,195.38944324d,35y,0h,0t,0r
-#
-# https://earth.google.com/web/@40.0788,-105.169072,1615.83371101a,196.41606213d,35y,0h,0t,0r
 def parse_area(max_lat, min_lat, max_lon, min_lon):
     '''
     Given area coordinates parses area based on screenshot image size
     input: string max and min coordinates of latitude and longitude
     output: lst of coordinates for each are the screenshot images
     '''
-    #https://gis.stackexchange.com/questions/228489/how-to-convert-image-pixel-to-latitude-and-longitude
-
-    #https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet
-
-    #https://spie.org/membership/spie-professional-magazine/spie-professional-archives-and-special-content/2016_october_archive/optics-of-google-earth
-
-    #lhttps://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
 
 
-    # max_lat, min_lat, max_lon, min_lon = float(max_lat), float(min_lat), float(max_lon), float(min_lon)
+    max_lat, min_lat, max_lon, min_lon = float(max_lat), float(min_lat), float(max_lon), float(min_lon)
     coordinates = ['{},{}'.format(max_lat, max_lon)]
     new_lat, new_lon = max_lat, max_lon
     map_unit = .19166667 #scale: 23m/i , PPI: 120p/i
@@ -132,6 +114,13 @@ if __name__ == '__main__':
     # max_lat, min_lat, max_lon, min_lon = find_boundries('Jafay', coordinates)
     max_lat, max_lon, min_lat, min_lon = 40.078800, -105.169072, 40.072700, -105.150064
     c = parse_area(max_lat, min_lat, max_lon, min_lon)
-
-
     take_area_photos(c)
+
+    #shift calculation resources
+    #https://gis.stackexchange.com/questions/228489/how-to-convert-image-pixel-to-latitude-and-longitude
+
+    #https://gis.stackexchange.com/questions/48949/epsg-3857-or-4326-for-googlemaps-openstreetmap-and-leaflet
+
+    #https://spie.org/membership/spie-professional-magazine/spie-professional-archives-and-special-content/2016_october_archive/optics-of-google-earth
+
+    #lhttps://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters

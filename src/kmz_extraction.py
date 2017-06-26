@@ -4,7 +4,7 @@ import csv
 import re
 import pdb
 '''
-map this whole thing out and make it generalized
+Coverts kmz to kml file
 
 '''
 
@@ -45,9 +45,14 @@ class PlacemarkHandler(xml.sax.handler.ContentHandler):
             else:
                 self.mapping[self.name_tag][name] = self.buffer
         self.buffer = ""
-# http://programmingadvent.blogspot.com/2013/06/kmzkml-file-parsing-with-python.html
 
 def extract_coordinates(mapping):
+    '''
+    Extract the coordinates from the kml file
+    input: A file contatining the geospatical data for each area
+    output: csv format with with the areas and their associated corrdinates
+    '''
+
     output = []
     csv_format = []
     area_names_lst = []
@@ -76,6 +81,12 @@ def extract_coordinates(mapping):
 
 
 def extract_pdid(mapping):
+    '''
+    Extracted the prairie dog id from data source
+    input:file containing prairie dog colony area id's
+    output: a list of the prairie dog colony id's
+    '''
+
     pd_id_lst = []
     for d in mapping:
         dis = mapping[d]["description"]
@@ -92,6 +103,12 @@ def extract_pdid(mapping):
     return pd_id_lst
 
 def join_id_coordinates(id_lst, c_lst):
+    '''
+    Joined the prairie dog id's and their mapped coordinates
+    input: list of id's and coordinates
+    out: list of colony id and coordinates
+    '''
+
     table = []
     for i in range(len(id_lst)):
         row = id_lst[i] + ',' + c_lst[i]
@@ -103,6 +120,12 @@ def join_id_coordinates(id_lst, c_lst):
 
 
 def write_csv(csv_string):
+    '''
+    Creates csv file with the id's and mapped corrdinates
+    input: the list of colony id's and their mapped coordinates
+    output: csv with data
+    '''
+    
     with open('location_data.csv', "w") as f:
         # f.write("area_name, coordinates, \n".format())
         for s in csv_string:
@@ -133,3 +156,6 @@ if __name__ == '__main__':
     pd_id = extract_pdid(mapping)
     table = join_id_coordinates(pd_id, coordinates)
     c = write_csv(table)
+
+
+    #reference for class above http://programmingadvent.blogspot.com/2013/06/kmzkml-file-parsing-with-python.html

@@ -9,6 +9,11 @@ import pickle
 import os
 
 def combine_points(dic):
+    '''
+    Create a list of pixel coordinate values
+    input: Dictionary contatining area and coordinates
+    output: a list of tuple coordinates
+    '''
     coordinate_lst = []
 
     for k, v in dic.items():
@@ -17,6 +22,11 @@ def combine_points(dic):
     return coordinate_lst
 
 def plot_points(lst, image, outfile_path):
+    '''
+    Takes pixel coordinate points, plots them on top of the image
+    input: list of tuple coordinates, the image to plot on top of and the filepath to save the new image
+    output: A new marked image
+    '''
     p = 'area_labeled.png'
     plt.close('all')
     x = [tup[0] for tup in lst]
@@ -51,6 +61,11 @@ def plot_points(lst, image, outfile_path):
 
 
 def cluster_mounds(lst, image):
+    '''
+    Given the pixel coordinates cluster them together and map them on top of an image
+    input: List of pixel coordinates and image to map them on
+    output: New cluster image
+    '''
     kmeans = KMeans(n_clusters=2, random_state=6,).fit(lst)
 
     k_means_cluster_centers = np.sort(kmeans.cluster_centers_, axis=0)

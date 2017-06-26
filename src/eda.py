@@ -10,23 +10,11 @@ from zipfile import ZipFile
 import xml.sax, xml.sax.handler
 import csv
 
-
-def plot_eda_graphs(df):
-    columns = df.columns
-    fig = plt.figure()
-
-    plot_num = 1
-    for col in columns:
-        print(col)
-        xvals = df[col].unique
-        ax = plt.subplot(3,5,plot_num)
-        ax.plot(xvalsdf[col])
-        ax.set_title(col)
-
-        plot_num += 1
-    plt.tight_layout()
-
 def make_scatter_matrix(df):
+    ''' Can be used to create a scatter matrix  for columns of interest
+    input: dataframe
+    output: scatter matrix plot
+    '''
     df = df[['PD_ID','Year', 'Name', 'Acres', 'Hectares',
        'Plague', 'Manager', 'Perimeter', 'Activity', 'YearAcquir',
        'sdeWildlif', 'Shape_area', 'Shape_len']]
@@ -34,6 +22,10 @@ def make_scatter_matrix(df):
     plt.savefig('/Users/One-Life.Grind./Galvanize/Capstone/images/num_df_scatter.png')
 
 def plot_hist_kde(df):
+    '''Creates a histogram and KDE comparing the number of total colonies over the range of the data
+    input: dataframe
+    output: histogram and kde plot
+    '''
     df = df[['Year', 'Name']]
     X = np.sort(df.Year.unique()).astype(int, copy=False)
     df = df.groupby('Year').count()
@@ -56,10 +48,15 @@ def plot_hist_kde(df):
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.savefig('../images/colony_hist.png')
-    return y
+    # return y
 
 
 def plot_year_area_count(df):
+    '''
+    Creates a line graph representation of colony numbers of time
+    input: datafram
+    output: figure showing this representation
+    '''
     df = df[['Year', 'Name']]
     X = np.sort(df.Year.unique()).astype(int, copy=False)
     df = df.groupby('Year').count()
@@ -74,7 +71,7 @@ def plot_year_area_count(df):
     ax.set_ylabel('Number of Colonies')
     plt.xticks(rotation=45)
     plt.savefig('../images/colony_growth.png')
-    return df
+    # return df
 
 
 

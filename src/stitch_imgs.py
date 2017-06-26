@@ -5,6 +5,12 @@ import os
 
 
 def stitch_resize():
+    '''
+    Stitch screen shot images together to compose the entire area
+    input:None
+    output:the new image encompassing the entire area
+    '''
+    
     new_image = Image.new('RGBA', (9040, 5432))
 
     imgs = np.array(os.listdir('../../Capstone_images/cropped_Jafay'))
