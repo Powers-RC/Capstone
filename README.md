@@ -44,14 +44,14 @@ EDA
 ---
  The number of colonies tracked by Boulder and OSMP have increased by over 700% since this project began. My Tableau workbook below looks at acreage fluctuations for the different areas since 1996.
 
-[Check out my Tableau workbook here! Boulder Prairie Dog Acreage Over Time](https://public.tableau.com/views/Boulder_prairie_dog_areas/Dashboard1?:embed=y&:display_count=yes&publish=yes)
-
 ![Annual area numbers](images/colony_growth.png)
+
+[Check out my Tableau workbook here! Boulder Prairie Dog Acreage Over Time](https://public.tableau.com/views/Boulder_prairie_dog_areas/Dashboard1?:embed=y&:display_count=yes&publish=yes)
 
 
 Data Collection
 ---------------
-In order to identify prairie dog mounds, I need aerial imagery. I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location. This process was repeated as necessary until the whole colony area was traversed.  
+In order to identify prairie dog mounds, I needed aerial imagery. I developed a program using Selenium that would scrape Google Earth by navigating to a URL that contained specific coordinates and zoom level. Once a page was fully loaded the program would take a screen shot of the location. This process was repeated as necessary until the whole colony area was traversed.  
 
 ![GE gif](images/ge_gif.gif)
 
@@ -76,58 +76,52 @@ Model Selection
 ---------------
 We learned about two possible methods for image recognition, Multilayer Perceptrons(MLP) and Convolutional Neural Networks(CNN). While MLP is a great supervised learning algorithm, it is also pretty standard. CNN's have been optimized to perform in areas such as image recognition. I chose to tackle an image recognition problem using a CNN because it seemed like the only reasonable option to accomplish my goal. Also in practice a majority of industries do not not use CNN's and image recognition to solve their business problems, so I felt it was a good opportunity to showcase a different method.
 
-I trained my CNN on 75% of the 1577(16x16) unknown object and prairie dog mound images, and then tested on the remaining 25%. My classes were imbalanced 1250:327 respectively. To solve this problem I stratified my data. This process of divides members of the data into homogenous subclasses and draws from them according to a ratio as compared to the largest subpopulation.
+The amount of prairie dog mound photos as compared to unknown object photos was unbalanced so I stratified the images. This process divides members of the data into homogenous subclasses and draws from them according to a ratio as compared to the largest subpopulation.
 
-I designed a base model to compare the performance to any other models I developed with varying hyperparameters as shown below.
+I designed a model that produced a high level of precision to make sure my model was only identifying prairie dog mounds. Using a grid search and varying the models hyperparameters I was able to find several optimal models. In order to evaluate the performance of my models in an unbiased manner I split the data into a train, test(10%) and validation set. To compare how they would preform on unseen data I used 5-KFold cross validation and averaged my statistic of interest using the training and validations sets.
+
+
+The optimal model I found hyperparameters are shown below.
 
 |Model Hyperparameter   | Value   |
 |-----------------------|---------|
-|batch size             |128      |
-|number of epochs       |12       |
-|number of filters      |32       |
+|batch size             |10       |
+|number of epochs       |75       |
+|number of filters      |5        |
 |activation function    |relu     |
 |optimizer              |adam     |
-
-
-|Test Score   |Test Accuracy   | Precision   |Recall   |
-|-------------|----------------|-------------|---------|
-|0.4901       |0.7897          |0.4878       |0.6250   |
-
 
 
 My Model
 ---------
 ![CNN Example](images/cnn_example.jpg)
 
-Lets talk about the structure of my optimal CNN, the hyperparameters are described in the table below.
+Lets talk about the structure of my optimal CNN. The hyperparameters used were described in the table above.
 
-|Model Hyperparameter   | Value   |
-|-----------------------|---------|
-|batch size             |20       |
-|number of epochs       |20       |
-|number of filters      |250      |
-|activation function    |relu     |
-|optimizer              |Adamax   |
+Convolution begins by taking in the receptive field object that is 16x16x4 which is then convoluted by 5, 3x3 filters, producing 5 different feature maps of size 14x14x5. The filter weights were initialized using a truncated normal distribution, meaning weights are greater toward the center. If a drawn wight is more than two standard deviations away from the mean it is tossed out and redrawn.
 
+This forward process uses the activation function, RELU(Rectified Linear Unit). RELU transforms any negative value in the matrix to zero while keeping the rest constant(image with embedded neurons). These feature maps are convoluted again using the same size filter and activation function to produce 5, 12x12 new feature maps. Afterwards the dimensional object is downsampled using maxpooling. A 2x2 filter is applied to the input volume and extracts the maximum value from inside the filter. The filter then shifts the dimension of the filter until the whole volume is covered. The downsampling process reduces the spatial size and the number of parameters, which decreases the possibility of overfitting. This downsampling produces a value of images of size 5x6x6.
 
-Convolution begins by taking in the receptive field object that is 16x16x4 which is then convoluted by 250, 3x3 filters, producing 250 hundred different feature maps of size 14x14x4. The filter weights were initialized using a truncated normal distribution, meaning weights are larger toward the center and that any more than two standard deviations away from the mean are tossed out and then redrawn.
-
-This forward process uses the activation function,RELU(Rectified Linear Unit), which transforms any negative in the matrix to zero while keeping the rest constant(image with embedded neurons). Afterwards the dimensional object is downsampled using maxpooling. A 2x2 filter is applied to the input volume and extracts the maximum value from the filter. The filter then shifts the dimension of the filter until the whole volume is covered. The downsampling process reduces the spatial size and the number of parameters, which decreases the possibility of overfitting. This downsampling produces a value of images of size 4x4x4.
-
-I then use a dropout rate of 0.3, which randomly selects neurons to be dropped out at the set rate. This is a form of regularization because the neurons contribution to its downstream connected neighbors are disabled, helping to prevent overfitting.
+I then use a dropout rate of 0.3, which randomly selects neurons to be dropped out at the set rate. This is a form of regularization, only 70% of the neurons contribution to their downstream connected neighbors and the overall error. This means that only 70% of errors will be backpropagated through the network. All of these consequences do to the dropout layer helping to prevent overfitting.
 
 Lastly this matrix is applied to a sigmoid function to produce the a vector of labels, one for a prairie dog mound and zero for an unknown object. I used a threshold of 0.5 to assign these classifications.
 
-My model went through 20 epochs(forward pass and backpropagations) of all of the training samples. One training batch consisted of 20 samples so it took roughly 63 iterations to get through one epoch. A gradient descent optimizer called AdaMax was used which is a version of Adam(adaptive moment estimation) that produces adaptive learning rates for each parameter.  
+My model went through 75 epochs(forward pass and backpropagations) of all of the training samples. One training batch consisted of 10 samples so it took roughly 157 iterations to get through one epoch. A gradient descent optimizer called AdaMax was used which is a version of Adam(adaptive moment estimation) that produces adaptive learning rates for each parameter.  
 
 Model Results
 ----------
-When I tested my model on the holdout set the times it predicted a prairie dog mound, it was correct 91% of the time. Out of all of the identifiable prairie dog mounds my model identified 24% of them. I was satisfied with this result because the objective of my CNN was to filter blobs that had identified unknown objects as prairie dog mound and only present locations of actual mounds.
+When I tested my model on the holdout set the times it predicted a prairie dog mound, it was correct 77% of the time. Out of all of the identifiable prairie dog mounds my model identified 60% of them. I am not 100% satisfied with this result because the objective of my CNN was to filter blobs that had been identified as prairie dog mound when they where clearly unknown objects, there are some items to address in order to improve my precision.
 
 
 |Test Score   |Test Accuracy   | Precision   |Recall   |F1 Score   |
 |-------------|----------------|-------------|---------|-----------|
-|0.3788       |0.8379          |0.9090       |0.2439   |0.3846     |
+|0.3979       |0.8607          |0.7727       |0.6071   |0.6071     |
+
+
+To see how well my binary classifier was preforming I developed a Receiver Operator Characteristic curve(ROC). The curve shows the true positive rate vs. the false positive rate for all possible thresholds. The AUC of my model is 0.83 which tells you the probability the classifier will rank a randomly chosen positive observation higher than a randomly chosen negative observation.
+
+
+![Roc Curve](images/roc_curve.png)
 
 
 Mapping & Predicting Acreage
@@ -150,7 +144,7 @@ Using the polygon object from the previous section I was able to calculate the a
 
 Next Steps
 ----------
-My image shifts are slightly off and could be playing a large part in the acreage difference, I will make sure these shifts are exact and determine how this improves my calculated acreage. Currently I am using a single CNN. I want to develop a deep CNN in an attempt to improve my prairie dog mound classifier. I could also see some improvement in the classifier if I label more images and retrain my model. The last item I would like to develop is a class. Developing a class would allow me to create an instance for multiple prairie dog areas and provide functionality to predict the acreage for each one.  
+My image shifts are slightly off and could be playing a large part in the acreage difference, I will make sure these shifts are exact and determine how this improves my calculated acreage. Currently I am using a single CNN. I want to develop a deeper CNN in an attempt to improve my prairie dog mound classifier. I could also see some improvement in the classifier if I label more images and retrain my model. The last item I would like to develop is a class. Developing a class would allow me to create an instance for multiple prairie dog areas and provide functionality to predict the acreage for each one.  
 
 Thank you for reading!
 
