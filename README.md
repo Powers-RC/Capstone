@@ -88,8 +88,8 @@ The optimal model I found hyperparameters are shown below.
 |batch size             |10       |
 |number of epochs       |75       |
 |number of filters      |5        |
-|activation function    |relu     |
-|optimizer              |adam     |
+|activation function    |RELU     |
+|optimizer              |AdaMax   |
 
 
 My Model
