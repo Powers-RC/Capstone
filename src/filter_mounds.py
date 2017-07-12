@@ -37,7 +37,7 @@ def remove_blobObj(dic):
     input: The dictionary produced by predict_labels function
     output: A dictionary contatining only prairie dog mounds
     '''
-    
+
     d = copy.deepcopy(dic)
     new_dic ={}
     for im in d:
@@ -59,9 +59,9 @@ if __name__ == '__main__':
 
     # dict_data = pickle.load(open('../data/dict_data.pkl', 'rb'))
     # model =  load_model('../data/mound_classifier.HDF5')
-    # #
+    #
     # y = predict_labels(dict_data, model)
-
+    #
     # labeled_dict = pickle.load(open('../data/labeled_dict.pkl', 'rb'))
-    # #
+    #
     # d = remove_blobObj(labeled_dict)
